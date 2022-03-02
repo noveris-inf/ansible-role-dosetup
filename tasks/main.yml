@@ -1,0 +1,35 @@
+---
+
+# Install doctl
+- name: Install doctl
+  command: "timeout -s INT 5m snap install doctl"
+  retries: 5
+  delay: 10
+  register: doctl_install
+  until: "doctl_install.rc == 0"
+
+- name: Create kube directory
+  command: "mkdir -p ~/.kube"
+  args:
+    warn: false
+
+- name: Create snap directory
+  command: "mkdir -p ~/.config"
+  args:
+    warn: false
+
+- name: kube directory permissions
+  file:
+    state: directory
+    path: "~/.kube"
+    mode: 0750
+
+- name: doctl snap permissions
+  command: snap connect doctl:kube-config
+
+- name: doctl auth init
+  command: "doctl auth init -t {{ do_access_token }}"
+
+# Download kubeconfig from DO
+- name: Download kubeconfig
+  command: doctl kubernetes cluster kubeconfig save {{ do_kubernetes_id }}
