@@ -2,8 +2,6 @@
 
 - name: Create kube directory
   command: "mkdir -p ~/.kube"
-  args:
-    warn: false
 
 - name: kube directory permissions
   file:
